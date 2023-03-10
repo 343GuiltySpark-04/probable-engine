@@ -101,6 +101,24 @@ bool is_canonical()
 }
 
 /**
+ * Extract bits from an integer. This is the inverse of bitwise_shift ()
+ *
+ * @param num - The integer to extract bits from
+ * @param start - The bit position to start extracting
+ * @param length - The number of bits to extract
+ *
+ * @return The bits at the start of num that were extracted
+ */
+uint64_t bitwise_extract(uint64_t num, uint64_t start, uint64_t length)
+{
+    /* Create a mask by shifting 1 left by length bits and subtracting 1 */
+    uint64_t mask = (1 << length) - 1;
+
+    /* Shift num right by start bits and apply mask */
+    return (num >> (start - length + 1)) & mask;
+}
+
+/**
  * @brief Converts hex string to decimal number. This function is used to convert hex string to decimal number. For example convertHexToDecimal ( " 0A " ) would return 2.
  * @param hex The hex string to convert to decimal number. It is assumed that the array is terminated by 0
  */
@@ -150,6 +168,8 @@ L1:
     c_printf("[m]%s\n", "2) Canonical address checking.");
     c_printf("[m]%s\n", "3) Hex to Binary. (very buggy right now (seg faults on use))");
     c_printf("[m]%s\n", "4) Hex to Decimal.");
+    c_printf("[m]%s\n", "5) Bitwise extract (Dec).");
+    c_printf("[m]%s\n", "6) Bitwise extract (Hex).");
     c_printf("[m]%s\n", "9) Exit.");
     c_printf("[g]%s", ":> ");
     scanf("%u", &i);
@@ -174,6 +194,16 @@ L1:
     case 4:
         system("clear");
         goto L5;
+        break;
+
+    case 5:
+        system("clear");
+        goto L6;
+        break;
+
+    case 6:
+        system("clear");
+        goto L7;
         break;
 
     case 9: // Exit the program if user enters 9.
@@ -231,10 +261,40 @@ L4:
 L5:
 
     c_printf("[g]%s", "Enter Hex number to convert (without the 0x prefix): ");
-    scanf("%s", h2d_in);
+    scanf("%s", &h2d_in);
     h2d_res = convertHexToDecimal(h2d_in);
     c_printf("[m]%s", "Result: ");
     c_printf("[y]%u\n", h2d_res);
+
+    goto L1;
+
+    uint64_t s, l, n, bit_res;
+
+L6:
+
+    c_printf("[g]%s", "Enter decimal value to extract from: ");
+    scanf("%u", &n);
+    c_printf("[g]%s", "Enter bit to start from: ");
+    scanf("%u", &s);
+    c_printf("[g]%s", "Enter number of bits to extract: ");
+    scanf("%u", &l);
+    bit_res = bitwise_extract(n, s, l);
+    c_printf("[c]%s", "Here are the resulting bits: ");
+    c_printf("[y]%u\n", bit_res);
+
+    goto L1;
+
+L7:
+
+    c_printf("[g]%s", "Enter hex value to extract from (Without the 0x prefix): ");
+    scanf("%x", &n);
+    c_printf("[g]%s", "Enter bit to start from: ");
+    scanf("%u", &s);
+    c_printf("[g]%s", "Enter number of bits to extract: ");
+    scanf("%u", &l);
+    bit_res = bitwise_extract(n, s, l);
+    c_printf("[c]%s", "Here are the resulting bits: ");
+    c_printf("[y]%x\n", bit_res);
 
     goto L1;
 }
